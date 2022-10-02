@@ -101,15 +101,18 @@ router.post('/users/login', async(req, res)=>{
     let password= req.body.password;
     User.findOne({email:email},((err,user)=>{
         if(!user){
-            return res.send("email doesn't exist")        }
+            console.log("mail does not exist");
+            return res.json({msg:0})        }
             else{
                 bcrypt.compare(password,user.password).then((match)=>{
                     if(!match){
-                        res.send("wrong password");
+                        console.log("wrong password");
+                        res.json({msg:1});
                     }
-                })
-            }
-    }))
+                    else{
+            
+         
+   
      User.findByCredentials(email,password).then((user) =>{
          return user.createSession().then((refreshToken) =>{
              //session created successffuly
@@ -129,6 +132,10 @@ router.post('/users/login', async(req, res)=>{
          res.status(400).send(2);
 
      })
+    }
+})
+    }
+    }))
 })
 /**
  * generate and returns an access token
@@ -156,16 +163,9 @@ router.get('/users/getbyid/:id',async(req, res) => {
 router.put("/users/forgetpassword",async(req,res)=>{
     const emaill = req.body.email;
     var passwordd= req.body.password;
-    let constFactor = 10;
-
-     bcrypt.genSalt(10).then(salt => {
-        return bcrypt.hash(passwordd,salt);
-    }).then(passwordd=> {
-        console.log(passwordd);
-        updatepassword(passwordd,emaill);
-    }, err => {
-        console.log(err);
-    });
+   
+    updatepassword(passwordd,emaill);
+    
 
 
 
@@ -173,21 +173,7 @@ router.put("/users/forgetpassword",async(req,res)=>{
 
 })
 function updatepassword(password,emaill){
-  /*   try {
-        console.log(password);
-
-
-         const updatecomposant =
-User.findOneAndUpdate({email:emaill},{password:password},{
-            new: true
-        });
-
-        console.log(updatecomposant);
-       status(201).json(updatecomposant);
-
-    } catch (error) {
-        res.status(422).json(error);
-    } */
+    console.log(password);
     User.findOne({email:emaill
 
     }, function( err,element){
@@ -199,22 +185,7 @@ User.findOneAndUpdate({email:emaill},{password:password},{
 
     else{
      element.password =password;
-     element.save().then(()=>{
-        return element.createSession();
-    }).then((refreshToken)=>{
-        //session created successfully - refreshToken returned
-        // now we generate an access auth token for the user
-        return element.generateAccessAuthToken().then((accessToken)=>{
-            return{accessToken, refreshToken}
-        });
-    }).then((authTokens)=>{
-        element
-            .header('x-refresh-token',authTokens.refreshToken)
-            .header('x-access-token',authTokens.accessToken)
-            .send(element);
-    }).catch((e)=>{
-       // element.status(400).send(e);
-    })
+     element.save();
    }
    }
     )

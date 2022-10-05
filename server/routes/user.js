@@ -70,7 +70,15 @@ router.use(function(req,res,next){
 router.post('/users', async(req, res)=>{
     //sign up
     let body=req.body;
+    let email=req.body.email;
+    
     let newUser = new User(body);
+    User.findOne({email:email},((err,user)=>{
+        if(user){
+            console.log("mail exist");
+            return res.json({msg:0})        }
+           
+                    else{
     newUser.save().then(()=>{
         return newUser.createSession();
     }).then((refreshToken)=>{
@@ -87,6 +95,9 @@ router.post('/users', async(req, res)=>{
     }).catch((e)=>{
         res.status(400).send(e);
     })
+}
+}))
+
 })
 
 
@@ -204,3 +215,6 @@ function updatepassword(password,emaill){
 
 
 module.exports = router;
+
+
+       
